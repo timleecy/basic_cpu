@@ -1,10 +1,12 @@
 //RAM testbench
 //timleecy16@gmail.com
 
+`include "../macros/top_macro.vh"
+
 module ram_tb;
   
   parameter WIDTH = 32;
-  parameter WORD_SIZE = 8;
+  parameter WORD_SIZE;
 
   reg clk;
   reg wr_en;

@@ -1,8 +1,10 @@
 //RAM module with parameterized width and word size
-//Depth of RAM will depend on word size
+//Depth of RAM will depend on word size which is defined in top_macro.vh
 //timleecy16@gmail.com
 
-module ram #(parameter WIDTH=32, WORD_SIZE=8) (input clk, wr_en, input[WORD_SIZE-1:0] wr_addr, rd_addr, input[WIDTH-1:0] data_in, output[WIDTH-1:0] data_out);
+`include "../macros/top_macro.vh"
+
+module ram #(parameter WIDTH=32, WORD_SIZE) (input clk, wr_en, input[WORD_SIZE-1:0] wr_addr, rd_addr, input[WIDTH-1:0] data_in, output[WIDTH-1:0] data_out);
   
   reg[(2**WORD_SIZE)-1:0] ram_data[WIDTH-1:0];
 
