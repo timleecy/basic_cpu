@@ -1,0 +1,11 @@
+//32-bit RAM module with parametrized depth
+//timleecy16@gmail.com
+
+module ram (input clk, d, output q);
+  
+  always@(posedge clk) begin
+    q<=d;
+  end
+endmodule
+
+
