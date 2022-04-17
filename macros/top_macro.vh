@@ -1,2 +1,2 @@
-`define WORD_SIZE 8
-`define MEM_WIDTH 8 
+`define WORD_SIZE 16 
+`define ADDR_SIZE 8

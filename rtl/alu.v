@@ -1,9 +1,9 @@
-//Parameterized ALU module
+//ALU module
 //timleecy16@gmail.com
 
 `include "../macros/top_macro.vh"
 
-module alu #(parameter WORD_SIZE) (input signed[WORD_SIZE-1:0] a, b, input mode, output reg signed[WORD_SIZE-1:0] c, output reg overflow);
+module alu (input signed[`WORD_SIZE-1:0] a, b, input mode, output reg signed[`WORD_SIZE-1:0] c, output reg overflow);
 
   localparam ADD=0, SUB=1;
 

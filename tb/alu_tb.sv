@@ -5,20 +5,18 @@
 
 module alu_tb;
 
-  parameter WORD_SIZE = 8;
-
   enum {ADD,SUB} mode_t;
 
-  reg signed[WORD_SIZE-1:0] a,b;
+  reg signed[`WORD_SIZE-1:0] a,b;
   reg mode = ADD;
-  wire signed[WORD_SIZE-1:0] c;
+  wire signed[`WORD_SIZE-1:0] c;
   wire overflow;
 
-  alu #(WORD_SIZE) ALU1(.a(a), .b(b), .mode(mode), .c(c), .overflow(overflow));
+  alu ALU1(.a(a), .b(b), .mode(mode), .c(c), .overflow(overflow));
 
   //test data
-  int test_a[0:7] = {1,2,127,128,5,5,-128,-129};
-  int test_b[0:7] = {0,3,1,128,-1,-10,1,-5};
+  int test_a[0:7] = {32767,2,127,128,5,5,-128,-129};
+  int test_b[0:7] = {1,3,1,128,-1,-10,1,-5};
   int test_c[0:7];
 
   initial begin
