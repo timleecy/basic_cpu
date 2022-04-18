@@ -6,14 +6,14 @@
 
 module rom (input[`ADDR_SIZE-1:0] addr, output reg[`WORD_SIZE-1:0] data);
 
-  always@(*) begin
-	  case({addr+1,addr})
-		  {8'd1,8'd0}: data = {8'd12,8'd34};
-		  {8'd3,8'd2}: data = {8'd5,8'd76};
+  always@(addr) begin
+	  case(addr)
+		  0: data = {8'd0,8'd0};
+		  2: data = {8'd0,8'd5};
+		  4: data = {8'd0,8'd3};
 		  default: data = 'bx;
 	  endcase
   end
-
 endmodule
 
   

@@ -3,50 +3,102 @@
 
 `include "../macros/top_macro.vh"
 
-module cpu #(parameter MEM_WIDTH, WORD_SIZE) (input clk, rst, inout[MEM_WIDTH-1:0] data_bus, output[WORD_SIZE-1:0] addr_bus, output wr_en);
+module cpu_test (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SIZE-1:0] addr_bus, output reg wr_en);
 
-  localparam DECODE=0, LOAD_A=1, LOAD_B=2, WRITE_BACK=3, DONE=4;
+  localparam FETCH=0, LOADA=1, LOADB=2, WRITE_BACK=3, DONE=4;
+  reg[7:0] state = 0;
+  reg[7:0] next_state;
 
-  reg[WORD_SIZE-1:0] pc = 0;
-  reg[MEM_WIDTH-1:0] a,b;
-  wire[MEM_WIDTH-1:0] c;
-  reg mode;
-  reg wr_en_flag = 0;
-  wire overflow;
+  reg[`ADDR_SIZE-1:0] pc = 0;
+  reg[`ADDR_SIZE-1:0] addr_reg = 0;
+  reg[`WORD_SIZE-1:0] inst_reg;
+  reg[`WORD_SIZE-1:0] data_reg;
+  reg[`WORD_SIZE-1:0] a,b;
+  wire mode;
+  reg overflow; 
+  reg boot_done = 0;
 
-  reg[3:0] state = 0;
+  wire[`WORD_SIZE-1:0] alu_out;
+  //wire[`WORD_SIZE-1:0] c;
+  wire overflow_wire;
 
-  assign wr_en = wr_en_flag;
-  alu #(WORD_SIZE) ALU_cpu (.a(a), .b(b), .mode(mode), .c(c), .overflow(overflow));
-  
-  //program counter
-  always@(state) begin
-	  if(rst)
-		  pc <= 0;
+  //ALU instantiation and setting output to registers
+  alu ALU_cpu (.a(a), .b(b), .mode(mode), .c(alu_out), .overflow(overflow_wire));
+  assign mode = inst_reg[0];
+  /*always@(posedge clk) begin
+	  c <= alu_out;
+	  overflow <= overflow_wire;
+  end*/
+
+  //Bus assignment
+  assign addr_bus = addr_reg;
+  //assign data_bus = boot_done? (wr_en? data_reg:'bz):'bz;
+  assign data_bus = (boot_done & wr_en)? data_reg:'bz;
+  /*always@(*) begin
+	  if(boot_done) begin
+		  if(wr_en)
+			  data_bus = c;
+		  else
+			  data_bus = 'bz;
+	  end
+  end*/
+
+  //Boot flow
+  always@(posedge clk) begin
+	  if(~boot_done && addr_reg!=(2**`ADDR_SIZE - 2)) begin //if addr haven't reach 254
+		  wr_en <= 1;
+		  addr_reg <= addr_reg + 2;
+	  end
+	  else if(~boot_done && addr_reg==(2**`ADDR_SIZE - 2)) begin
+		  wr_en <= 0;
+		  addr_reg <= 0;
+		  boot_done <= 1;
+	  end
+  end
+
+  //Program counter??
+  always@(posedge clk) begin
+	  if(rst) begin
+		  addr_reg <= 0;
+		  boot_done <= 0;
+		  state <= 0;
+	  end
 	  else begin
-		  if(~wr_en_flag)
-			  pc <= pc + 1;
+		  if(boot_done && state!=WRITE_BACK) begin
+			  addr_reg <= addr_reg + 2;
+			  state <= next_state;
+		  end
+		  else if(boot_done && state==WRITE_BACK) begin
+			  addr_reg <= addr_reg;
+			  state <= next_state;
+		  end
 	  end
   end
 
   always@(posedge clk) begin
-	  if(rst || state==DONE)
-		  state <= 0;
-	  else
-		  state <= state + 1;
+	  case(state)
+		  FETCH: inst_reg <= data_bus;
+		  LOADA: a <= data_bus;
+		  LOADB: b <= data_bus;
+		  WRITE_BACK: begin
+			  data_reg <= alu_out;
+			  wr_en <= 1;
+		  end
+		  DONE: wr_en <= 0;
+	  endcase
   end
 
-  always@(posedge clk) begin
-  	  case(state)
-		  DECODE: mode <= data_bus[0];
-          LOAD_A: a <= data_bus;
-          LOAD_B: b <= data_bus;
-          WRITE_BACK: wr_en_flag <= 1;
-          DONE: wr_en_flag <= 0;
-  	  endcase
+  always@(*) begin
+	  case(state)
+		  FETCH: next_state <= LOADA;
+		  LOADA: next_state <= LOADB;
+		  LOADB: next_state <= WRITE_BACK;
+		  WRITE_BACK: next_state <= DONE;
+		  DONE: next_state <= FETCH;
+	  endcase
   end
 
-  assign addr_bus = pc;
-  assign data_bus = wr_en_flag? c:'bz;
+
+
 
 endmodule
