@@ -3,7 +3,7 @@
 
 `include "../macros/top_macro.vh"
 
-module ram_cpu_basic_test;
+module soc_basic_test;
 
   reg clk;
   reg rst;
@@ -12,11 +12,11 @@ module ram_cpu_basic_test;
   wire[`ADDR_SIZE-1:0] addr_bus;
   wire[`WORD_SIZE-1:0] data_bus;
 
-  cpu_test CPU(.clk(clk), .rst(rst), .data_bus(data_bus), .addr_bus(addr_bus), .wr_en(wr_en));
+  cpu_test CPU(.clk(clk), .rst(rst), .data_bus(data_bus), .addr_bus(addr_bus), .wr_en(wr_en), .boot_done_flag(boot_done));
 
-  ram RAM(.clk(clk), .wr_en(wr_en), .addr(addr_bus), .data(data_bus));
+  ram RAM(.clk(clk), .rst(rst), .wr_en(wr_en), .addr(addr_bus), .data(data_bus));
 
-  rom ROM(.addr(addr_bus), .data(data_bus));
+  rom ROM(.boot_done(boot_done), .addr(addr_bus), .data(data_bus));
 
   initial begin
     clk = 0;
@@ -26,6 +26,8 @@ module ram_cpu_basic_test;
   initial begin
     rst = 1;
     #5 rst = 0;
+	#50 rst = 1;
+	#5 rst = 0;
   end
 
   always@(clk) begin

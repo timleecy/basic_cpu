@@ -4,16 +4,20 @@
 
 `include "../macros/top_macro.vh"
 
-module rom (input[`ADDR_SIZE-1:0] addr, output reg[`WORD_SIZE-1:0] data);
+module rom (input boot_done, input[`ADDR_SIZE-1:0] addr, inout[`WORD_SIZE-1:0] data);
+  
+  reg[`WORD_SIZE-1:0] rom_data;
 
   always@(addr) begin
 	  case(addr)
-		  0: data = {8'd0,8'd0};
-		  2: data = {8'd0,8'd5};
-		  4: data = {8'd0,8'd3};
-		  default: data = 'bx;
+		  0: rom_data = {8'd0,8'd0};
+		  2: rom_data = {8'd0,8'd5};
+		  4: rom_data = {8'd0,8'd3};
+		  default: rom_data = 'bx; 
 	  endcase
   end
+
+  assign data = boot_done? 'bz:rom_data;
 endmodule
 
   
