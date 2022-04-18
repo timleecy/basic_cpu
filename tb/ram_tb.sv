@@ -36,7 +36,7 @@ module ram_tb;
 		 $display("Writing (%0d,%0d) into memory location %0d and %0d", data_bus[15:8],data_bus[7:0], addr_bus+1, addr_bus);
 	 end
 
-	 //read
+	 //read 
 	 #2 wr_en = 0; 
 	 for(int j=0;j<20;j=j+2) begin
 		 addr_bus = j;
