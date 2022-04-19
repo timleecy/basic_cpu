@@ -4,7 +4,7 @@
 
 `include "../macros/top_macro.vh"
 
-module rom (input boot_done, input[`ADDR_SIZE-1:0] addr, inout[`WORD_SIZE-1:0] data);
+module rom (input boot, input[`ADDR_SIZE-1:0] addr, inout[`WORD_SIZE-1:0] data);
   
   reg[`WORD_SIZE-1:0] rom_data;
 
@@ -17,7 +17,7 @@ module rom (input boot_done, input[`ADDR_SIZE-1:0] addr, inout[`WORD_SIZE-1:0] d
 	  endcase
   end
 
-  assign data = boot_done? 'bz:rom_data;
+  assign data = boot? rom_data:'bz;
 endmodule
 
   

@@ -3,7 +3,7 @@
 
 `include "../macros/top_macro.vh"
 
-module cpu_test (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SIZE-1:0] addr_bus, output reg wr_en, output boot_done_flag);
+module cpu_test (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SIZE-1:0] addr_bus, output reg wr_en, output boot_flag);
   
   //states
   localparam FETCH=0, LOADA=1, LOADB=2, WRITE_BACK=3, DONE=4;
@@ -17,8 +17,8 @@ module cpu_test (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SI
   reg[`WORD_SIZE-1:0] data_reg;
   reg[`WORD_SIZE-1:0] a,b;
   reg overflow; 
-  reg boot_done = 0;
-  assign boot_done_flag = boot_done;
+  reg boot = 1;
+  assign boot_flag = boot;
 
   wire[`WORD_SIZE-1:0] alu_out;
   wire overflow_wire;
@@ -30,14 +30,14 @@ module cpu_test (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SI
 
   //Bus assignment
   assign addr_bus = addr_reg;
-  assign data_bus = (boot_done & wr_en)? data_reg:'bz;
+  assign data_bus = (~boot & wr_en)? data_reg:'bz;
 
   //Seq logic for state
   always@(posedge clk) begin
 	  if(rst)
 		  state <= 0;
 	  else begin
-		  if(~boot_done)
+		  if(boot)
 			  state <= 0;
 		  else
 			  state <= next_state;
@@ -49,7 +49,7 @@ module cpu_test (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SI
 	  if(rst)
 		  pc <= 0;
 	  else begin
-		  if(~boot_done) begin
+		  if(boot) begin
 			  if(pc !=(2**`ADDR_SIZE - 2))
 				  pc <= pc + 2;
 			  else
@@ -67,7 +67,7 @@ module cpu_test (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SI
   
   //Seq logic for addr_reg
   always@(posedge clk) begin
-	  if(~boot_done) 
+	  if(boot) 
 		  addr_reg <= pc;
 	  else begin
 		  if(state == WRITE_BACK)
@@ -109,16 +109,16 @@ module cpu_test (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SI
   //Seq logic for boot_done
   always@(posedge clk) begin
 	  if(rst)
-		  boot_done <= 0;
+		  boot <= 1;
 	  else begin
-		  if (~boot_done && addr_reg==(2**`ADDR_SIZE - 2)) 
-			  boot_done <= 1;
+		  if (boot && addr_reg==(2**`ADDR_SIZE - 2)) 
+			  boot <= 0;
 	  end
   end
 
   //Seq logic for wr_en
   always@(posedge clk) begin
-	  if(~boot_done) begin
+	  if(boot) begin
 		  if(addr_reg!=(2**`ADDR_SIZE - 2))
 			  wr_en <= 1;
 		  else
@@ -188,11 +188,11 @@ module cpu_test (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SI
 
   always@(*) begin
 	  case(state)
-		  FETCH: next_state <= LOADA;
-		  LOADA: next_state <= LOADB;
-		  LOADB: next_state <= WRITE_BACK;
-		  WRITE_BACK: next_state <= DONE;
-		  DONE: next_state <= FETCH;
+		  FETCH: next_state = LOADA;
+		  LOADA: next_state = LOADB;
+		  LOADB: next_state = WRITE_BACK;
+		  WRITE_BACK: next_state = DONE;
+		  DONE: next_state = FETCH;
 	  endcase
   end
 
