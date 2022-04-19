@@ -18,10 +18,10 @@ module alu (input signed[`WORD_SIZE-1:0] a, b, input mode, output reg signed[`WO
   //overflow handling
   always@(*) begin
 	  if(mode == ADD) 
-		  assign overflow = (a>0)&(b>0)&(c<=0) | (a<0)&(b<0)&(c>=0);
+		  overflow = (a>0)&(b>0)&(c<=0) | (a<0)&(b<0)&(c>=0);
 	  
 	  else if(mode == SUB)
-		  assign overflow = (a>0)&(b<0)&(c<=0) | (a<0)&(b>0)&(c>=0);
+		  overflow = (a>0)&(b<0)&(c<=0) | (a<0)&(b>0)&(c>=0);
   end
 
 endmodule
