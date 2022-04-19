@@ -12,8 +12,8 @@ module rom (input boot_done, input[`ADDR_SIZE-1:0] addr, inout[`WORD_SIZE-1:0] d
 	  case(addr)
 		  0: rom_data = {8'd0,8'd0};
 		  2: rom_data = {8'd0,8'd5};
-		  4: rom_data = {8'd0,8'd3};
-		  default: rom_data = 'bx; 
+		  4: rom_data = {-16'd3};
+		  default: rom_data = 'b0; 
 	  endcase
   end
 

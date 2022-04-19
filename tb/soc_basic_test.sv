@@ -28,21 +28,13 @@ module soc_basic_test;
     #5 rst = 0;
 	#50 rst = 1;
 	#5 rst = 0;
+	#400 rst = 1;
+	#5 rst = 0;
   end
 
   always@(clk) begin
 	  $display("%d, %d, %b, %d", addr_bus, data_bus, wr_en, $time);
   end
-
- //test RAM loading
- /*initial begin
-	 #1 addr_bus=0; 
-	 #1 $display(addr_bus,,data_bus);
-	 #1 addr_bus=1; 
-	 #1 $display(addr_bus,,data_bus);
-	 #1 addr_bus=2; 
-	 #1 $display(addr_bus,,data_bus);
- end*/
 
 endmodule
 

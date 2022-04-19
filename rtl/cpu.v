@@ -32,6 +32,112 @@ module cpu_test (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SI
   assign addr_bus = addr_reg;
   assign data_bus = (boot_done & wr_en)? data_reg:'bz;
 
+  //Seq logic for state
+  always@(posedge clk) begin
+	  if(rst)
+		  state <= 0;
+	  else begin
+		  if(~boot_done)
+			  state <= 0;
+		  else
+			  state <= next_state;
+	  end
+  end
+
+  //Seq logic for pc
+  always@(posedge clk) begin
+	  if(rst)
+		  pc <= 0;
+	  else begin
+		  if(~boot_done) begin
+			  if(pc !=(2**`ADDR_SIZE - 2))
+				  pc <= pc + 2;
+			  else
+				  pc <= 0;
+		  end
+
+		  else begin
+			  if (state != WRITE_BACK) 
+				  pc <= pc + 2;
+			  else 
+				  pc <= pc;
+		  end
+	  end
+  end
+  
+  //Seq logic for addr_reg
+  always@(posedge clk) begin
+	  if(~boot_done) 
+		  addr_reg <= pc;
+	  else begin
+		  if(state == WRITE_BACK)
+			  addr_reg <= addr_reg;
+		  else
+			  addr_reg <= pc;
+	  end
+  end
+
+  //Seq logic for inst_reg
+  always@(posedge clk) begin
+	  if (state == FETCH)
+		  inst_reg <= data_bus;
+  end
+
+  //Seq logic for data_reg
+  always@(posedge clk) begin
+	  if (state == WRITE_BACK)
+		  data_reg <= alu_out;
+  end
+
+  //Seq logic for reg a
+  always@(posedge clk) begin
+	  if (state == LOADA)
+		  a <= data_bus;
+  end
+
+  //Seq logic for reg b
+  always@(posedge clk) begin
+	  if (state == LOADB)
+		  b <= data_bus;
+  end
+  
+  //Seq logic for overflow reg
+  always@(posedge clk) begin
+	  overflow = overflow_wire;
+  end
+
+  //Seq logic for boot_done
+  always@(posedge clk) begin
+	  if(rst)
+		  boot_done <= 0;
+	  else begin
+		  if (~boot_done && addr_reg==(2**`ADDR_SIZE - 2)) 
+			  boot_done <= 1;
+	  end
+  end
+
+  //Seq logic for wr_en
+  always@(posedge clk) begin
+	  if(~boot_done) begin
+		  if(addr_reg!=(2**`ADDR_SIZE - 2))
+			  wr_en <= 1;
+		  else
+			  wr_en <= 0;
+	  end
+
+	  else begin
+		  if(state == WRITE_BACK)
+			  wr_en <= 1;
+		  else
+			  wr_en <= 0;
+	  end
+  end
+
+
+/*
+
+
+
   //Boot flow
   always@(posedge clk) begin
 	  if(~boot_done && addr_reg!=(2**`ADDR_SIZE - 2)) begin //if addr haven't reach 254
@@ -76,6 +182,9 @@ module cpu_test (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SI
 		  DONE: wr_en <= 0;
 	  endcase
   end
+
+
+  */
 
   always@(*) begin
 	  case(state)
