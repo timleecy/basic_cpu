@@ -12,7 +12,7 @@ module soc_basic_test;
   wire[`ADDR_SIZE-1:0] addr_bus;
   wire[`WORD_SIZE-1:0] data_bus;
 
-  cpu_test CPU(.clk(clk), .rst(rst), .data_bus(data_bus), .addr_bus(addr_bus), .wr_en(wr_en), .boot_flag(boot));
+  cpu CPU(.clk(clk), .rst(rst), .data_bus(data_bus), .addr_bus(addr_bus), .wr_en(wr_en), .boot(boot));
 
   ram RAM(.clk(clk), .rst(rst), .wr_en(wr_en), .addr(addr_bus), .data(data_bus));
 

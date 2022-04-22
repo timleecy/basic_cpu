@@ -6,12 +6,14 @@
 module rom_load_test;
 
   reg clk;
+  reg rst = 0;
   reg wr_en;
+  reg boot = 0;
   reg[`ADDR_SIZE-1:0] addr;
   wire[`WORD_SIZE-1:0] data;
 
-  ram RAM(.clk(clk), .wr_en(wr_en), .addr(addr), .data(data));
-  rom ROM(.addr(addr), .data(data));
+  ram RAM(.clk(clk), .rst(rst), .wr_en(wr_en), .addr(addr), .data(data));
+  rom ROM(.boot(boot), .addr(addr), .data(data));
 
   initial begin
 	  clk = 0;
