@@ -10,9 +10,10 @@ Registers:
 [7:0]pc
 [7:0]addr_reg
 [15:0]inst_reg
-[15:0]data_reg
+[15:0]data_out
 [15:0]a
 [15:0]b
+[15:0]temp
 [15:0]gpreg
 -- 0:RESET
 -- 1:BOOT
@@ -31,29 +32,37 @@ Instructions:
 0. NOP (0x0)
    Does nothing.
 
-1. LOADA (0x1)	
-   Loads data into register a. Bit 5-7 represents type of operand.
-   001: Constant
-   010: Memory location
-   100: Memory address of intended memory location (pointer)
+1. LOAD (0x1)	
+   Loads data into register.
+   Bit [10] determines which register (0 for a, 1 for b)
+   Bit [9:8] determines the type of operand:
+   0: 8-bit constant
+   1: memory location
+   2: pointer to memory location
 
-   eg: 0xFF 010_5'd1 (Loads contents of memory location 0xFF into register a)
+   eg: `LOAD 001 0xFF (Loads contents of memory location 0xFF into register a)
 
-2. LOADB (0x2)
-   Same as LOADA but for register b.
+3. STO (0x2)
+   Store contents of specified register in bit[10:8] into memory location in operand.
+   0: a
+   1: b
+   2: data_out
+   3: inst_reg
+   4: addr_reg
+   5: gpreg
 
-3. STO (0x3)
-   Store contents of specified register in bit 5-7 into memory location stated.
-   000: reg a
-   001: reg b
-   010: inst_reg
-   011: data_reg
-   100: gpreg
+   eg: `STO 010 0xFF (Stores data in data_out in memory location 0xFF)
 
-   eg: 0xFF 011_5'h3 (Stores data in data_reg in memory location 0xFF)
+4. MOV (0x3)
+   Move contents of specified register in bit[7:4] to specified register in bit[3:0].
+   0: a
+   1: b
+   2: data_out
+   3: inst_reg
+   4: addr_reg
+   5: gpreg
 
-4. 
-
+   eg: `MOV 3'bx 0000_0001 (Move content of register a to register b)
 
 
 

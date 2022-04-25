@@ -10,9 +10,10 @@ module rom (input boot, input[`ADDR_SIZE-1:0] addr, inout[`WORD_SIZE-1:0] data);
 
   always@(addr) begin
 	  case(addr)
-		  0: rom_data = {`LOADA,3'h1,8'h5};
-		  2: rom_data = {`LOADB,3'h2,8'h12};
-		  4: rom_data = {`STO,3'h0,8'hFF};
+		  0: rom_data = {`LOAD,3'h0,8'h5};
+		  2: rom_data = {`LOAD,3'h1,8'h12};
+		  4: rom_data = {`STO,3'h0,8'hFE};
+		  6: rom_data = {`MOV,3'h0,8'h1};
 		  default: rom_data = 'b0; 
 	  endcase
   end

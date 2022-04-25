@@ -3,6 +3,6 @@
 
 //instructions
 `define NOP 5'h0
-`define LOADA 5'h1
-`define LOADB 5'h2
-`define STO 5'h3
+`define LOAD 5'h1
+`define STO 5'h2
+`define MOV 5'h3
