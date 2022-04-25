@@ -57,16 +57,6 @@ module cpu (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SIZE-1:
 	  end
   end
 
-  //Seq logic for pc
-  always@(posedge clk) begin
-	  if(rst || boot)
-		  pc <= 0;
-	  else begin
-		  if(state == 4)
-			  pc <= pc + 2;
-	  end
-  end
-
   //Seq logic for boot reg
   always@(posedge clk) begin
 	  if(rst)
@@ -87,6 +77,7 @@ module cpu (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SIZE-1:
   //Main logic for boot flow and instructions
   always@(posedge clk) begin
 	  if(rst) begin //reset flow
+		  pc <= 0;
 		  addr_reg <= 0;
 		  a <= 0;
 		  b <= 0;
@@ -100,6 +91,8 @@ module cpu (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SIZE-1:
           else
               gpreg[WR_EN] <= 0;
 	  end
+	  else if(state==4) //pc increment
+		  pc <= pc + 2;
 	  else begin //instruction flow
 		  case(opcode)
 	
