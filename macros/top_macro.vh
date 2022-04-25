@@ -6,3 +6,5 @@
 `define LOAD 5'h1
 `define STO 5'h2
 `define MOV 5'h3
+`define ADD 5'h4
+`define SUB 5'h5

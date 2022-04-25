@@ -64,6 +64,13 @@ Instructions:
 
    eg: `MOV 3'bx 0000_0001 (Move content of register a to register b)
 
+5. ADD (0x4)
+   Add contents of reg a and b and stores answer in data_out reg. (No operands needed)
+
+6. SUB (0x5)
+   Subtract contents of reg b from contents of reg b (a-b) and stores answer in data_out reg. (No operands needed)
+
+
 
 
 

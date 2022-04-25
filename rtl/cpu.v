@@ -31,11 +31,9 @@ module cpu (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SIZE-1:
   end
 
   //ALU instantiation and setting output to registers
-  wire mode;
   wire[`WORD_SIZE-1:0] alu_out;
   wire overflow;
-  alu ALU_cpu (.a(a), .b(b), .mode(mode), .c(alu_out), .overflow(overflow));
-  //assign mode = inst_reg[0];
+  alu ALU_cpu (.a(a), .b(b), .opcode(opcode), .c(alu_out), .overflow(overflow));
   
   //set OVFL reg to overflow wire
   always@(posedge clk) begin
@@ -181,6 +179,19 @@ module cpu (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SIZE-1:
 					  end
 				  endcase
 			  end
+
+			  `ADD: begin
+				  case(state)
+					  1: data_out <= alu_out;
+				  endcase
+			  end
+
+			  `SUB: begin
+				  case(state)
+					  1: data_out <= alu_out;
+				  endcase
+			  end
+
 		  endcase
 	  end
   end
