@@ -9,7 +9,7 @@ module cpu (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SIZE-1:
   reg[7:0] state = 0;
 
   //registers
-  localparam RESET=0, BOOT=1, WR_EN=2, OVFL=3; //used to reference bit of gpreg
+  localparam RESET=0, BOOT=1, WR_EN=2, OVFL=3, EQ=4, BIG=5, JUMP=6, COND1=7, COND2=8; //used to reference bit of gpreg
   reg[`ADDR_SIZE-1:0] pc = 0;
   reg[`ADDR_SIZE-1:0] addr_reg = 0;
   reg[`WORD_SIZE-1:0] inst_reg;
@@ -25,25 +25,15 @@ module cpu (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SIZE-1:
   assign wr_en = gpreg[WR_EN];
   assign boot = gpreg[BOOT];
 
-  //set RESET register to rst input wire
-  always@(posedge clk) begin
-	  gpreg[RESET] <= rst;
-  end
-
   //ALU instantiation and setting output to registers
   wire[`WORD_SIZE-1:0] alu_out;
   wire overflow;
-  alu ALU_cpu (.a(a), .b(b), .opcode(opcode), .c(alu_out), .overflow(overflow));
+  wire[1:0] comp_flag;
+  alu ALU_cpu (.a(a), .b(b), .opcode(opcode), .c(alu_out), .overflow(overflow), .comp_flag(comp_flag));
   
-  //set OVFL reg to overflow wire
-  always@(posedge clk) begin
-	  gpreg[OVFL] <= overflow;
-  end
-
   //Bus assignment
   assign addr_bus = boot? addr_reg: ((state == 0)? pc:addr_reg);
   assign data_bus = (~boot & wr_en)? data_out:'bz;
-
 
   //Seq logic for state
   always@(posedge clk) begin
@@ -57,25 +47,11 @@ module cpu (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SIZE-1:
 	  end
   end
 
-  //Seq logic for boot reg
-  always@(posedge clk) begin
-	  if(rst)
-		  gpreg[BOOT] <= 1;
-	  else begin
-		  if(boot && addr_reg==(2**`ADDR_SIZE - 2))
-			  gpreg[BOOT] <= 0;
-	  end
-  end
-
-
-  //Seq logic for inst_reg
-  always@(posedge clk) begin
-      if (state == 0)
-          inst_reg <= data_bus;
-  end
-
   //Main logic for boot flow and instructions
   always@(posedge clk) begin
+	  gpreg[RESET] <= rst; 
+	  gpreg[OVFL] <= overflow;
+
 	  if(rst) begin //reset flow
 		  pc <= 0;
 		  addr_reg <= 0;
@@ -83,16 +59,28 @@ module cpu (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SIZE-1:
 		  b <= 0;
 		  data_out <= 0;
 		  temp <= 0;
+		  gpreg[BOOT] <= 1;
           gpreg[WR_EN] <= 1;
+          gpreg[JUMP] <= 0;
 	  end
+
 	  else if(boot) begin //boot flow
 		  if(addr_reg!=(2**`ADDR_SIZE - 2)) 
 			  addr_reg <= addr_reg + 2;
-          else
+		  else begin
+			  gpreg[BOOT] <= 0;
               gpreg[WR_EN] <= 0;
+		  end
 	  end
-	  else if(state==4) //pc increment
+
+	  else if(state==0) begin //fetch instruction
+		  inst_reg <= data_bus;
+		  gpreg[JUMP] <= 0;
+	  end
+
+	  else if(state==4 && !gpreg[JUMP]) //pc increment
 		  pc <= pc + 2;
+
 	  else begin //instruction flow
 		  case(opcode)
 	
@@ -184,6 +172,44 @@ module cpu (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SIZE-1:
 					  1: data_out <= alu_out;
 				  endcase
 			  end
+
+			  `COMP: begin
+				  case(state)
+					  1: {gpreg[BIG],gpreg[EQ]} <= comp_flag;
+				  endcase
+			  end
+
+			  `JMPU: begin
+				  case(state)
+					  1: pc <= operand;
+					  2: gpreg[JUMP] <= 1;
+				  endcase
+			  end
+
+			  `JMPC: begin
+				  case(state)
+					  1: begin
+						  case(inst_reg[10:8])
+							  0: pc <= (gpreg[EQ]==1) & operand; //If equal
+							  1: pc <= (gpreg[EQ]==0) & operand; //If not equal
+							  2: pc <= (gpreg[BIG]==1) & operand; //If a>b
+							  3: pc <= (gpreg[BIG]==1 || gpreg[EQ]==1) & operand; //If a>=b
+							  4: pc <= (gpreg[BIG]==0) & operand; //If a<b
+							  5: pc <= (gpreg[BIG]==0 || gpreg[EQ]==1) & operand; //If a<=b
+							  6: pc <= (gpreg[COND1] && gpreg[COND2]) & operand; //If arg1 AND arg2
+							  7: pc <= (gpreg[COND1] || gpreg[COND2]) & operand; //If arg1 OR arg2
+						  endcase
+					  end
+					  2: gpreg[JUMP] <= 1;
+				  endcase
+			  end
+
+			  `MOVG: begin
+				  case(state)
+					  1: gpreg[inst_reg[3:0]] <= gpreg[inst_reg[7:4]];
+				  endcase
+			  end
+
 
 		  endcase
 	  end

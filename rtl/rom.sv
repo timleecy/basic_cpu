@@ -55,7 +55,46 @@ function[7:0] MOV_op (input string reg1, reg2);
   end
 endfunction
 
+function[2:0] JMPC_op (input string cond);
+  begin
+	  case(cond)
+		  "==": JMPC_op = 0;
+		  "!=": JMPC_op = 1;
+		  ">" : JMPC_op = 2;
+		  ">=": JMPC_op = 3;
+		  "<" : JMPC_op = 4;
+		  "|" : JMPC_op = 7;
+	  endcase
+  end
+endfunction
 
+function[7:0] MOVG_op (input string bit1, bit2);
+  begin
+	  case(bit1)
+		  "RESET": MOVG_op[7:4] = 0; 
+		  "BOOT": MOVG_op[7:4] = 1; 
+		  "WR_EN": MOVG_op[7:4] = 2; 
+		  "OVFL": MOVG_op[7:4] = 3; 
+		  "EQ": MOVG_op[7:4] = 4; 
+		  "BIG": MOVG_op[7:4] = 5; 
+		  "JUMP": MOVG_op[7:4] = 6; 
+		  "COND1": MOVG_op[7:4] = 7; 
+		  "COND2": MOVG_op[7:4] = 8;
+	  endcase
+
+	  case(bit2)
+		  "RESET": MOVG_op[3:0] = 0; 
+		  "BOOT": MOVG_op[3:0] = 1; 
+		  "WR_EN": MOVG_op[3:0] = 2; 
+		  "OVFL": MOVG_op[3:0] = 3; 
+		  "EQ": MOVG_op[3:0] = 4; 
+		  "BIG": MOVG_op[3:0] = 5; 
+		  "JUMP": MOVG_op[3:0] = 6; 
+		  "COND1": MOVG_op[3:0] = 7; 
+		  "COND2": MOVG_op[3:0] = 8;
+	  endcase
+  end
+endfunction
 
 module rom (input boot, input[`ADDR_SIZE-1:0] addr, inout[`WORD_SIZE-1:0] data);
 

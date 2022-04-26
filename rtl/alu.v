@@ -3,7 +3,7 @@
 
 `include "../macros/top_macro.vh"
 
-module alu (input signed[`WORD_SIZE-1:0] a, b, input[4:0] opcode, output reg signed[`WORD_SIZE-1:0] c, output reg overflow);
+module alu (input signed[`WORD_SIZE-1:0] a, b, input[4:0] opcode, output reg signed[`WORD_SIZE-1:0] c, output reg overflow, output reg[1:0] comp_flag);
 
 
   //too be added with more modes
@@ -11,6 +11,10 @@ module alu (input signed[`WORD_SIZE-1:0] a, b, input[4:0] opcode, output reg sig
 	  case(opcode) 
 		  `ADD:c = a + b;
 		  `SUB:c = a - b;
+		  `COMP:begin
+			  comp_flag[0] = (a==b);
+			  comp_flag[1] = (a>b);
+		  end
 	  endcase
   end
 
