@@ -75,7 +75,7 @@ Instructions:
 6. SUB (0x5)
    Subtract contents of reg b from contents of reg b (a-b) and stores answer in data_out reg. (No operands needed)
 
-7. COMP (0x6)
+7. CMP (0x6)
    Compare reg a and reg b. Sets EQ, BIG flags accordingly.
 
 8. JMPU (0x7)
@@ -96,37 +96,5 @@ Instructions:
     Move specific bit of gpreg stated in bit[7:4] to another bit of gpreg stated in bit[3:0].
 
     eg: `MOVG 3'bx 0000_0001 (Copy content of gpreg[0] to gpreg[1])
-
-
-if(x==y and w==z)
-	x=1
-
-LOAD x a
-LOAD y b
-CMP
-MOVG gpreg[EQ] gpreg[COND1]
-LOAD w a
-LOAD z b 
-CMP
-MOVG gpreg[EQ] gpreg[COND2]
-AND gpreg[COND1] gpreg[COND2]
-JMP Condition7
-
-
-LOAD 1 a
-STO a x
-
-
-for(i=0, i<10, i++)
-	x+=1
-
-LOAD 0 temp
-LOAD 10 
-LOAD x a
-LOAD 1 b
-ADD
-MOV data_out a
-
-
 
 

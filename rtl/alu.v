@@ -11,7 +11,7 @@ module alu (input signed[`WORD_SIZE-1:0] a, b, input[4:0] opcode, output reg sig
 	  case(opcode) 
 		  `ADD:c = a + b;
 		  `SUB:c = a - b;
-		  `COMP:begin
+		  `CMP:begin
 			  comp_flag[0] = (a==b);
 			  comp_flag[1] = (a>b);
 		  end

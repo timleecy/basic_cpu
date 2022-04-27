@@ -173,7 +173,7 @@ module cpu (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SIZE-1:
 				  endcase
 			  end
 
-			  `COMP: begin
+			  `CMP: begin
 				  case(state)
 					  1: {gpreg[BIG],gpreg[EQ]} <= comp_flag;
 				  endcase
@@ -190,17 +190,28 @@ module cpu (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SIZE-1:
 				  case(state)
 					  1: begin
 						  case(inst_reg[10:8])
-							  0: pc <= (gpreg[EQ]==1) & operand; //If equal
-							  1: pc <= (gpreg[EQ]==0) & operand; //If not equal
-							  2: pc <= (gpreg[BIG]==1) & operand; //If a>b
-							  3: pc <= (gpreg[BIG]==1 || gpreg[EQ]==1) & operand; //If a>=b
-							  4: pc <= (gpreg[BIG]==0) & operand; //If a<b
-							  5: pc <= (gpreg[BIG]==0 || gpreg[EQ]==1) & operand; //If a<=b
-							  6: pc <= (gpreg[COND1] && gpreg[COND2]) & operand; //If arg1 AND arg2
-							  7: pc <= (gpreg[COND1] || gpreg[COND2]) & operand; //If arg1 OR arg2
+							  0: pc <= (gpreg[EQ]==1)? operand:pc; //If equal
+							  1: pc <= (gpreg[EQ]==0)? operand:pc; //If not equal
+							  2: pc <= (gpreg[BIG]==1)? operand:pc; //If a>b
+							  3: pc <= (gpreg[BIG]==1 || gpreg[EQ]==1)? operand:pc; //If a>=b
+							  4: pc <= (gpreg[BIG]==0)? & operand:pc; //If a<b
+							  5: pc <= (gpreg[BIG]==0 || gpreg[EQ]==1)? operand:pc; //If a<=b
+							  6: pc <= (gpreg[COND1] && gpreg[COND2])? operand:pc; //If arg1 AND arg2
+							  7: pc <= (gpreg[COND1] || gpreg[COND2])? operand:pc; //If arg1 OR arg2
 						  endcase
 					  end
-					  2: gpreg[JUMP] <= 1;
+					  2: begin
+						  case(inst_reg[10:8])
+							  0: gpreg[JUMP] <= (gpreg[EQ]==1); //If equal
+							  1: gpreg[JUMP] <= (gpreg[EQ]==0); //If not equal
+							  2: gpreg[JUMP] <= (gpreg[BIG]==1); //If a>b
+							  3: gpreg[JUMP] <= (gpreg[BIG]==1 || gpreg[EQ]==1); //If a>=b
+							  4: gpreg[JUMP] <= (gpreg[BIG]==0); //If a<b
+							  5: gpreg[JUMP] <= (gpreg[BIG]==0 || gpreg[EQ]==1); //If a<=b
+							  6: gpreg[JUMP] <= (gpreg[COND1] && gpreg[COND2]); //If arg1 AND arg2
+							  7: gpreg[JUMP] <= (gpreg[COND1] || gpreg[COND2]); //If arg1 OR arg2
+						  endcase
+					  end
 				  endcase
 			  end
 

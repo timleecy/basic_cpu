@@ -8,7 +8,7 @@
 `define MOV  5'h3
 `define ADD  5'h4
 `define SUB  5'h5
-`define COMP 5'h6
+`define CMP 5'h6
 `define JMPU 5'h7
 `define JMPC 5'h8
 `define MOVG 5'h9
