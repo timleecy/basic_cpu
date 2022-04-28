@@ -28,7 +28,7 @@ module soc_basic_test;
     #5 rst = 0;
 	#50 rst = 1;
 	#5 rst = 0;
-	#400 rst = 1;
+	#1000 rst = 1;
 	#5 rst = 0;
   end
 

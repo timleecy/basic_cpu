@@ -132,3 +132,7 @@ function[15:0] movg (input string bit1, bit2);
 
 	movg = {`MOVG,3'b0,bit1_num,bit2_num};
 endfunction
+
+function[15:0] halt;
+	halt = {`HALT,3'b0,8'b0};
+endfunction

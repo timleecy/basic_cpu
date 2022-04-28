@@ -12,3 +12,4 @@
 `define JMPU 5'h7
 `define JMPC 5'h8
 `define MOVG 5'h9
+`define HALT 5'hA

@@ -97,4 +97,5 @@ Instructions:
 
     eg: `MOVG 3'bx 0000_0001 (Copy content of gpreg[0] to gpreg[1])
 
-
+11. HALT (0xA)
+    Stops the program (stop incrementing pc).

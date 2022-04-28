@@ -78,7 +78,7 @@ module cpu (input clk, rst, inout[`WORD_SIZE-1:0] data_bus, output[`ADDR_SIZE-1:
 		  gpreg[JUMP] <= 0;
 	  end
 
-	  else if(state==4 && !gpreg[JUMP]) //pc increment
+	  else if(state==4 && !gpreg[JUMP] && opcode!=`HALT) //pc increment
 		  pc <= pc + 2;
 
 	  else begin //instruction flow
