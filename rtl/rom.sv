@@ -11,25 +11,6 @@ module rom (input boot, input[`ADDR_SIZE-1:0] addr, inout[`WORD_SIZE-1:0] data);
 
   reg[`WORD_SIZE-1:0] rom_data;
 
-  /*always@(addr) begin
-	  case(addr)
-		  0: rom_data = {`LOAD,LOAD_op("a","constant"),8'h5}; //load constant 5 to reg a
-		  2: rom_data = {`LOAD,LOAD_op("b","memory"),8'h12}; //load contents of memory location 0x12 to reg b
-		  4: rom_data = {`STO,STO_op("a"),8'hFE}; //store contents of reg a to memory location 0xFE
-		  6: rom_data = {`MOV,3'h0,MOV_op("a","b")}; //move contents of reg a to reg b
-		  8: rom_data = {`ADD,3'h0,8'h0}; //add a+b
-		  10: rom_data = {`STO,STO_op("data_out"),8'hFE}; //store sum in data_out to memory location 0xFE
-		  18: rom_data = 16'h1388; //store number 5000 in this location
-		  0: rom_data = {`LOAD, LOAD_op("a","memory"), 8'd18};
-		  2: rom_data = {`LOAD, LOAD_op("b","memory"), 8'd20};
-		  4: rom_data = {`SUB, 3'h0, 8'h0};
-		  6: rom_data = {`STO, STO_op("data_out"), 8'hFE};
-		  18: rom_data = -16'd32768;
-		  20: rom_data = 16'd1;
-		  default: rom_data = 'b0; 
-	  endcase
-  end*/
-
   //test for loop
   //x=0;y=0;z=2;
   //for(i=0;i<10;i++)
